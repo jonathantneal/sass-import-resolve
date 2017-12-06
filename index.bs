@@ -1,0 +1,102 @@
+<pre class='metadata'>
+Title: Sass Import Resolve
+Shortname: sass-import-resolve
+Level: 1
+Status: DREAM
+URL: https://jonathantneal.github.io/sass-import-resolve/
+Editor: Jonathan Neal, jonathantneal@hotmail.com
+Abstract: The goal of this document is to specify an algorithm for resolving
+			 imports in Sass.
+</pre>
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@jon_neal">
+<meta name="twitter:title" content="Sass Import Resolve">
+<meta name="twitter:description" content="An algorithm for resolving imports in Sass">
+<meta name="twitter:image" content="https://jonathantneal.github.io/sass-import-resolve/card.jpg">
+<meta property="og:image" content="https://jonathantneal.github.io/sass-import-resolve/card.jpg" itemprop="thumbnailUrl">
+<meta property="og:title" content="Sass Import Resolve">
+<meta property="og:url" content="https://jonathantneal.github.io/sass-import-resolve/">
+<meta property="og:site_name" content="GitHub">
+<meta property="og:description" content="An algorithm for resolving imports in Sass">
+<link href="sass-logo.ico" rel="shortcut icon" type="image/x-icon">
+
+<h2 id=introduction>
+Introduction</h2>
+
+The purpose of this document is to specify an algorithm for resolving the
+location of external style sheets included by the ''@import'' rule in Sass
+tooling. It is written for developers and implementors looking for formal
+guidance, and should match existing implementions.
+
+<h3 id=at-import>
+The ''@import'' rule</h3>
+
+The ''@import'' rule allows users to import style rules from other style sheets.
+If an ''@import'' rule refers to a valid stylesheet, user agents must treat the
+contents of the stylesheet as if they were written in place of the ''@import''
+rule, with two exceptions:
+
+<ul>
+	<li>If a feature *explicitly* defines that it only applies to a particular
+	stylesheet, and not any imported ones (such as the ''@namespace'' rule),
+	then it doesn’t apply to the imported stylesheet.
+	<li> If a feature relies on the relative position of two or more constructs
+	in a stylesheet (such as the requirement that an ''@else'' rule follow
+	another conditional group rule, or the requirement that ''@charset'' must
+	not have any other content preceding it), it only applies between
+	constructs in the same stylesheet.
+</ul>
+
+Any ''@import'' rules must precede all other at-rules and style rules in a
+style sheet (besides ''@charset'', which must be the first thing in the style
+sheet if it exists), or else the ''@import'' rule is invalid.
+
+<h2 id=resolve-algorithm>
+Resolve Algorithm</h2>
+
+When ''@import'' is called, the following high-level algorithm is used to
+resolve the location of a file within <code>url(id)</code> from
+<code>cwd</code>:
+
+1. if <code>id</code> begins with <code>/</code>
+	1. <code>cwd</code> is the filesystem root
+2. <code>file</code> is <code>cwd/id</code>
+3. <code>base</code> is base path of <code>file</code>
+4. <code>dir</code> is directory path of <code>file</code>
+5. if <code>base</code> ends with <code>.sass</code>, <code>.scss</code>, or <code>.css</code>
+	1. test whether <code>file</code> exists
+	2. if <code>base</code> does not start with <code>_</code>
+		1. test whether <code>dir/_base</code> exists
+6. otherwise
+	1. test whether <code>dir/base.scss</code> exists
+	2. test whether <code>dir/base.sass</code> exists
+	3. test whether <code>dir/base.css</code> exists
+	4. if <code>base</code> does not start with <code>_</code>
+		1. test whether <code>dir/_base.scss</code> exists
+		2. test whether <code>dir/_base.sass</code> exists
+		3. test whether <code>dir/_base.css</code> exists
+6. if the length of existing files is <code>1</code>
+	1. return the existing file
+7. otherwise, if the length of existing files is greater than <code>1</code>
+	1. throw <code>"It's not clear which file to import"</code>
+8. otherwise, if <code>base</code> does not end with <code>.css</code>
+	1. throw <code>"File to import not found or unreadable"</code>
+
+<h2 id=implementations>
+Implementations</h2>
+
+<a href=https://github.com/rotundasoftware/parcelify>Parcelify</a> is a tool to
+add css to your npm modules consumed with browserify. It includes the
+<a>Resolve Algorithm</a> internally.
+
+<a href=https://github.com/postcss/postcss-import>PostCSS Import</a> is a
+PostCSS plugin to transform ''@import'' rules by inlining content. It includes
+the <a>Resolve Algorithm</a> internally, but diverges from the
+<a>load_as_directory</a> algorithm by using the <code>style</code> field and
+then the <code>main</code> field if possible.
+
+<a href=https://github.com/reworkcss/rework-npm>rework-npm</a> is a tool to
+import CSS styles from NPM modules using rework. It includes the
+<a>Resolve Algorithm</a> internally, but diverges by supporting
+<a href="https://github.com/isaacs/node-glob#glob-primer">glob notation</a>.

@@ -77,11 +77,8 @@ export default function resolve(id, rawopts) {
 			throw new Error('It\'s not clear which file to import');
 		}
 
-		// otherwise, if `base` does not end with `.css`
-		if (!ends_with_css_extension(base)) {
-			// throw `"File to import not found or unreadable"`
-			throw new Error('File to import not found or unreadable');
-		}
+		// throw `"File to import not found or unreadable"`
+		throw new Error('File to import not found or unreadable');
 	});
 }
 

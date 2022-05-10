@@ -49,6 +49,14 @@ const resolve = require('.');
 	)
 },
 {
+	name: 'will resolve a scss index file',
+	test: () => resolve('tests/pass-4')
+},
+{
+	name: 'will resovle a sass _index file',
+	test: () => resolve('tests/pass-5')
+},
+{
 	name: 'will not resolve a non-existent file',
 	test: () => resolve('tests/fail-x').then(
 		() => Promise.reject(),

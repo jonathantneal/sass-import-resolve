@@ -46,7 +46,15 @@ export default function resolve(id, rawopts) {
 			// test whether `dir/base.sass` exists
 			test_file(join(dir, `${base}.sass`), opts),
 			// test whether `dir/base.css` exists
-			test_file(join(dir, `${base}.css`), opts)
+			test_file(join(dir, `${base}.css`), opts),
+			// test whether `dir/base/index.scss` exists
+			test_file(join(dir, base, 'index.scss'), opts),
+			// test whether `dir/base/index.sass` exists
+			test_file(join(dir, base, 'index.sass'), opts),
+			// test whether `dir/base/_index.scss` exists
+			test_file(join(dir, base, '_index.scss'), opts),
+			// test whether `dir/base/_index.sass` exists
+			test_file(join(dir, base, '_index.sass'), opts)
 		);
 
 		// if `base` does not start with `_`

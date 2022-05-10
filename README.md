@@ -74,7 +74,11 @@ the location of a file within `url(id)` from `cwd`:
    1. test whether `dir/base.scss` exists
    2. test whether `dir/base.sass` exists
    3. test whether `dir/base.css` exists
-   4. if `base` does not start with `_`
+   4. test whether `dir/base/index.scss` exists
+   5. test whether `dir/base/index.sass` exists
+   6. test whether `dir/base/_index.scss` exists
+   7. test whether `dir/base/_index.sass` exists
+   8. if `base` does not start with `_`
       1. test whether `dir/_base.scss` exists
       2. test whether `dir/_base.sass` exists
       3. test whether `dir/_base.css` exists
